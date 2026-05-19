@@ -1,223 +1,337 @@
-import { useState } from 'react'
-import { SlidersHorizontal, X } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { SlidersHorizontal, X, Check } from 'lucide-react'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
 import { t } from '@/i18n'
+import { useState } from 'react'
 
-const CITIES = ['Тель-Авив', 'Нетания', 'Хайфа', 'Беэр-Шева', 'Ашдод', 'Петах-Тиква', 'Ришон-ле-Цион', 'Хадера', 'Реховот', 'Холон', 'Раанана', 'Герцлия']
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const CITIES = [
+  'Тель-Авив', 'Нетания', 'Хайфа', 'Беэр-Шева', 'Ашдод',
+  'Петах-Тиква', 'Ришон-ле-Цион', 'Хадера', 'Реховот', 'Холон',
+  'Раанана', 'Герцлия', 'Бат-Ям', 'Модиин', 'Иерусалим',
+]
+
+const ROOMS = ['1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5', '5+']
+
+const RENT_PRICES_MAX = [2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000, 12000, 15000, 20000]
+const BUY_PRICES_MAX  = [500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000]
+
+const PROP_TYPES = [
+  { value: 'apartment', key: 'ptype_apartment' },
+  { value: 'house',     key: 'ptype_house'     },
+  { value: 'studio',    key: 'ptype_studio'    },
+  { value: 'room',      key: 'ptype_room'      },
+] as const
 
 const INFRA_KEYS = [
   'kindergarten', 'school', 'mall', 'park', 'gym',
   'hospital', 'beach', 'transport', 'restaurant', 'synagogue', 'public_pool',
 ] as const
 
-const PROP_TYPES = [
-  { value: 'apartment', key: 'ptype_apartment' },
-  { value: 'house',     key: 'ptype_house' },
-  { value: 'studio',    key: 'ptype_studio' },
-  { value: 'room',      key: 'ptype_room' },
-  { value: 'commercial',key: 'ptype_commercial' },
-] as const
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function fmtPrice(n: number): string {
+  if (n >= 1_000_000) return `${n / 1_000_000}M₪`
+  if (n >= 1_000)     return `${n / 1_000}K₪`
+  return `${n}₪`
+}
+
+function roomVal(s: string): number {
+  return s === '5+' ? 5 : parseFloat(s)
+}
+
+// ── Chip component ───────────────────────────────────────────────────────────
+
+function Chip({
+  label, active, onClick,
+}: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onPointerDown={(e) => { e.stopPropagation(); onClick() }}
+      className={`px-3 py-1.5 rounded-xl text-sm border transition-colors select-none ${
+        active
+          ? 'border-blue-500 bg-blue-500 text-white font-medium'
+          : 'border-gray-200 bg-white text-gray-700'
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+// ── Section header ───────────────────────────────────────────────────────────
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-5">
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{title}</p>
+      {children}
+    </div>
+  )
+}
+
+// ── Main component ───────────────────────────────────────────────────────────
 
 export function SearchFiltersPanel() {
   const { filters, setFilters, resetFilters } = useStore()
-  const { lang, rtl } = useTelegram()
+  const { lang, rtl, haptic } = useTelegram()
   const [open, setOpen] = useState(false)
 
-  const activeCount = Object.values(filters).filter(
-    (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true)
-  ).length
+  const activeCount = [
+    filters.deal_type,
+    filters.property_types?.length,
+    filters.cities?.length,
+    filters.rooms_min,
+    filters.rooms_max,
+    filters.price_max,
+    filters.price_min,
+    filters.infrastructure?.length,
+    filters.with_photos,
+    filters.pool,
+    filters.parking_min,
+  ].filter(Boolean).length
+
+  const priceOptions = filters.deal_type === 'buy' ? BUY_PRICES_MAX : RENT_PRICES_MAX
+
+  function openPanel() { haptic('light'); setOpen(true) }
+  function closePanel() { haptic('light'); setOpen(false) }
+  function doReset() { haptic('medium'); resetFilters() }
+
+  function toggleRoomsMin(r: string) {
+    const v = roomVal(r)
+    setFilters({ rooms_min: filters.rooms_min === v ? undefined : v })
+  }
+  function toggleRoomsMax(r: string) {
+    const v = roomVal(r)
+    setFilters({ rooms_max: filters.rooms_max === v ? undefined : v })
+  }
+  function togglePriceMax(p: number) {
+    setFilters({ price_max: filters.price_max === p ? undefined : p })
+  }
+  function toggleInfra(key: string) {
+    const cur = filters.infrastructure ?? []
+    const has = cur.includes(key)
+    setFilters({ infrastructure: has ? cur.filter((k) => k !== key) : [...cur, key] })
+  }
+  function toggleCity(city: string) {
+    const cur = filters.cities ?? []
+    const has = cur.includes(city)
+    setFilters({ cities: has ? cur.filter((c) => c !== city) : [...cur, city] })
+  }
+  function togglePtype(value: string) {
+    const cur = filters.property_types ?? []
+    const has = cur.includes(value)
+    setFilters({ property_types: has ? cur.filter((v) => v !== value) : [...cur, value] })
+  }
 
   return (
     <>
+      {/* Trigger button */}
       <button
-        onClick={() => setOpen(true)}
-        className="relative flex items-center gap-1.5 px-3 py-2 bg-gray-100 rounded-xl text-sm text-gray-700"
+        type="button"
+        onClick={openPanel}
+        className="relative flex items-center gap-1.5 px-3 py-2 bg-gray-100 rounded-xl text-sm text-gray-700 active:bg-gray-200"
       >
         <SlidersHorizontal className="w-4 h-4" />
         {t('filters_title', lang)}
         {activeCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
             {activeCount}
           </span>
         )}
       </button>
 
+      {/* Bottom sheet */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+        <div
+          className="fixed inset-0 z-50"
+          style={{ touchAction: 'none' }}
+        >
+          {/* Backdrop */}
           <div
-            className="relative w-full bg-white rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
+            className="absolute inset-0 bg-black/50"
+            onPointerDown={closePanel}
+          />
+
+          {/* Sheet — positioned above backdrop via z-index */}
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-10 flex flex-col"
+            style={{ maxHeight: '88vh' }}
             dir={rtl ? 'rtl' : 'ltr'}
+            onPointerDown={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">{t('filters_title', lang)}</h3>
-              <button onClick={() => setOpen(false)}>
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
-            {/* Deal type */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('filters_deal', lang)}</p>
-              <div className="flex gap-2">
-                {[
-                  { v: undefined,  k: 'filters_all'  },
-                  { v: 'rent',     k: 'filters_rent' },
-                  { v: 'buy',      k: 'filters_buy'  },
-                ].map(({ v, k }) => (
-                  <button
-                    key={k}
-                    onClick={() => setFilters({ deal_type: v as 'rent' | 'buy' | undefined })}
-                    className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
-                      filters.deal_type === v
-                        ? 'border-blue-500 bg-blue-50 text-blue-600'
-                        : 'border-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {t(k as Parameters<typeof t>[0], lang)}
-                  </button>
-                ))}
+            {/* Handle + header */}
+            <div className="flex-shrink-0 px-5 pt-4 pb-3 border-b border-gray-100">
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">{t('filters_title', lang)}</h3>
+                <button
+                  type="button"
+                  onPointerDown={closePanel}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
               </div>
             </div>
 
-            {/* Property types */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('filters_ptype', lang)}</p>
-              <div className="flex flex-wrap gap-2">
-                {PROP_TYPES.map(({ value, key }) => {
-                  const sel = filters.property_types?.includes(value)
-                  return (
-                    <button
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-5 pt-4 pb-2">
+
+              {/* Deal type */}
+              <Section title={t('filters_deal', lang)}>
+                <div className="flex gap-2 flex-wrap">
+                  {([
+                    { v: undefined, k: 'filters_all'  },
+                    { v: 'rent',    k: 'filters_rent' },
+                    { v: 'buy',     k: 'filters_buy'  },
+                  ] as const).map(({ v, k }) => (
+                    <Chip
+                      key={k}
+                      label={t(k, lang)}
+                      active={filters.deal_type === v}
+                      onClick={() => setFilters({ deal_type: v, price_max: undefined, price_min: undefined })}
+                    />
+                  ))}
+                </div>
+              </Section>
+
+              {/* Property type */}
+              <Section title={t('filters_ptype', lang)}>
+                <div className="flex gap-2 flex-wrap">
+                  {PROP_TYPES.map(({ value, key }) => (
+                    <Chip
                       key={value}
-                      onClick={() => {
-                        const cur = filters.property_types ?? []
-                        setFilters({
-                          property_types: sel ? cur.filter((tp) => tp !== value) : [...cur, value],
-                        })
-                      }}
-                      className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
-                        sel ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-600'
-                      }`}
-                    >
-                      {t(key, lang)}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+                      label={t(key, lang)}
+                      active={!!filters.property_types?.includes(value)}
+                      onClick={() => togglePtype(value)}
+                    />
+                  ))}
+                </div>
+              </Section>
 
-            {/* Cities */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('filters_city', lang)}</p>
-              <div className="flex flex-wrap gap-2">
-                {CITIES.map((city) => {
-                  const sel = filters.cities?.includes(city)
-                  return (
-                    <button
+              {/* City */}
+              <Section title={t('filters_city', lang)}>
+                <div className="flex gap-2 flex-wrap">
+                  {CITIES.map((city) => (
+                    <Chip
                       key={city}
-                      onClick={() => {
-                        const cur = filters.cities ?? []
-                        setFilters({ cities: sel ? cur.filter((c) => c !== city) : [...cur, city] })
-                      }}
-                      className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
-                        sel ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-600'
-                      }`}
-                    >
-                      {city}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+                      label={city}
+                      active={!!filters.cities?.includes(city)}
+                      onClick={() => toggleCity(city)}
+                    />
+                  ))}
+                </div>
+              </Section>
 
-            {/* Rooms */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('filters_rooms', lang)}</p>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="number" placeholder={t('filters_from', lang)}
-                  value={filters.rooms_min ?? ''}
-                  onChange={(e) => setFilters({ rooms_min: e.target.value ? +e.target.value : undefined })}
-                  className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm"
-                />
-                <span className="text-gray-400">—</span>
-                <input
-                  type="number" placeholder={t('filters_to', lang)}
-                  value={filters.rooms_max ?? ''}
-                  onChange={(e) => setFilters({ rooms_max: e.target.value ? +e.target.value : undefined })}
-                  className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
+              {/* Rooms min */}
+              <Section title={`${t('filters_rooms', lang)} — ${t('filters_from', lang)}`}>
+                <div className="flex gap-2 flex-wrap">
+                  {ROOMS.map((r) => (
+                    <Chip
+                      key={r}
+                      label={r}
+                      active={filters.rooms_min === roomVal(r)}
+                      onClick={() => toggleRoomsMin(r)}
+                    />
+                  ))}
+                </div>
+              </Section>
 
-            {/* Price */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('filters_price', lang)}</p>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="number" placeholder={t('filters_from', lang)}
-                  value={filters.price_min ?? ''}
-                  onChange={(e) => setFilters({ price_min: e.target.value ? +e.target.value : undefined })}
-                  className="w-28 border border-gray-200 rounded-xl px-3 py-2 text-sm"
-                />
-                <span className="text-gray-400">—</span>
-                <input
-                  type="number" placeholder={t('filters_to', lang)}
-                  value={filters.price_max ?? ''}
-                  onChange={(e) => setFilters({ price_max: e.target.value ? +e.target.value : undefined })}
-                  className="w-28 border border-gray-200 rounded-xl px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
+              {/* Rooms max */}
+              <Section title={`${t('filters_rooms', lang)} — ${t('filters_to', lang)}`}>
+                <div className="flex gap-2 flex-wrap">
+                  {ROOMS.map((r) => (
+                    <Chip
+                      key={r}
+                      label={r}
+                      active={filters.rooms_max === roomVal(r)}
+                      onClick={() => toggleRoomsMax(r)}
+                    />
+                  ))}
+                </div>
+              </Section>
 
-            {/* Infrastructure */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">{t('infra_title', lang)}</p>
-              <div className="flex flex-wrap gap-2">
-                {INFRA_KEYS.map((key) => {
-                  const sel = filters.infrastructure?.includes(key)
-                  return (
-                    <button
+              {/* Price max */}
+              <Section title={`${t('filters_price', lang)} — до`}>
+                <div className="flex gap-2 flex-wrap">
+                  {priceOptions.map((p) => (
+                    <Chip
+                      key={p}
+                      label={fmtPrice(p)}
+                      active={filters.price_max === p}
+                      onClick={() => togglePriceMax(p)}
+                    />
+                  ))}
+                </div>
+              </Section>
+
+              {/* Infrastructure */}
+              <Section title={t('infra_title', lang)}>
+                <div className="flex gap-2 flex-wrap">
+                  {INFRA_KEYS.map((key) => (
+                    <Chip
                       key={key}
-                      onClick={() => {
-                        const cur = filters.infrastructure ?? []
-                        setFilters({
-                          infrastructure: sel
-                            ? cur.filter((k) => k !== key)
-                            : [...cur, key],
-                        })
-                      }}
-                      className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
-                        sel ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-600'
-                      }`}
-                    >
-                      {t(`infra_${key}` as Parameters<typeof t>[0], lang)}
-                    </button>
-                  )
-                })}
-              </div>
+                      label={t(`infra_${key}` as Parameters<typeof t>[0], lang)}
+                      active={!!filters.infrastructure?.includes(key)}
+                      onClick={() => toggleInfra(key)}
+                    />
+                  ))}
+                </div>
+              </Section>
+
+              {/* Toggles row */}
+              <Section title={t('filters_extras', lang)}>
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onPointerDown={(e) => { e.stopPropagation(); setFilters({ with_photos: filters.with_photos ? undefined : true }) }}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <span className="text-sm text-gray-700">{t('filters_photos', lang)}</span>
+                    <div className={`w-11 h-6 rounded-full transition-colors ${filters.with_photos ? 'bg-blue-500' : 'bg-gray-200'}`}>
+                      <div className={`w-5 h-5 bg-white rounded-full mt-0.5 shadow transition-transform ${filters.with_photos ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onPointerDown={(e) => { e.stopPropagation(); setFilters({ pool: filters.pool ? undefined : true }) }}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <span className="text-sm text-gray-700">{t('filters_pool', lang)}</span>
+                    <div className={`w-11 h-6 rounded-full transition-colors ${filters.pool ? 'bg-blue-500' : 'bg-gray-200'}`}>
+                      <div className={`w-5 h-5 bg-white rounded-full mt-0.5 shadow transition-transform ${filters.pool ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                </div>
+              </Section>
+
             </div>
 
-            {/* With photos */}
-            <label className="flex items-center gap-3 mb-6 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={filters.with_photos ?? false}
-                onChange={(e) => setFilters({ with_photos: e.target.checked || undefined })}
-                className="w-4 h-4 accent-blue-500"
-              />
-              <span className="text-sm text-gray-700">{t('filters_photos', lang)}</span>
-            </label>
-
-            <div className="flex gap-3">
-              <Button variant="secondary" onClick={resetFilters} className="flex-1">
+            {/* Sticky footer */}
+            <div className="flex-shrink-0 px-5 py-4 border-t border-gray-100 flex gap-3 bg-white">
+              <button
+                type="button"
+                onPointerDown={(e) => { e.stopPropagation(); doReset() }}
+                className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm font-medium text-gray-600 bg-white active:bg-gray-50"
+              >
                 {t('filters_reset', lang)}
-              </Button>
-              <Button onClick={() => setOpen(false)} className="flex-1">
+              </button>
+              <button
+                type="button"
+                onPointerDown={(e) => { e.stopPropagation(); closePanel() }}
+                className="flex-1 py-3 rounded-2xl bg-blue-500 text-white text-sm font-semibold flex items-center justify-center gap-1.5 active:bg-blue-600"
+              >
+                <Check className="w-4 h-4" />
                 {t('filters_apply', lang)}
-              </Button>
+                {activeCount > 0 && (
+                  <span className="bg-white/30 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {activeCount}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>

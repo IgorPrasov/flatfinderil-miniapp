@@ -51,6 +51,8 @@ export const translations = {
   filters_to:         { ru: 'до',          en: 'to',            he: 'עד',         fr: 'à' },
   filters_price:      { ru: 'Цена (₪)',    en: 'Price (₪)',     he: 'מחיר (₪)',   fr: 'Prix (₪)' },
   filters_photos:     { ru: 'Только с фото', en: 'With photos only', he: 'עם תמונות בלבד', fr: 'Avec photos seulement' },
+  filters_pool:       { ru: '🏊 Есть бассейн', en: '🏊 Has pool', he: '🏊 יש בריכה', fr: '🏊 Avec piscine' },
+  filters_extras:     { ru: 'Дополнительно', en: 'Extras',      he: 'נוסף',       fr: 'Extras' },
   filters_reset:      { ru: 'Сбросить',    en: 'Reset',         he: 'איפוס',      fr: 'Réinitialiser' },
   filters_apply:      { ru: 'Применить',   en: 'Apply',         he: 'החל',        fr: 'Appliquer' },
 
