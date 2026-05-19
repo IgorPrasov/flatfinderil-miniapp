@@ -20,9 +20,15 @@ const BUY_PRICES  = [500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000
 const PROP_TYPES = [
   { value: 'apartment', key: 'ptype_apartment' },
   { value: 'house',     key: 'ptype_house'     },
+  { value: 'villa',     key: 'ptype_villa'     },
+  { value: 'penthouse', key: 'ptype_penthouse' },
+  { value: 'duplex',    key: 'ptype_duplex'    },
   { value: 'studio',    key: 'ptype_studio'    },
   { value: 'room',      key: 'ptype_room'      },
 ] as const
+
+// Property types where pool filter makes sense
+const POOL_TYPES = new Set(['villa', 'penthouse', 'house'])
 
 const INFRA_KEYS = [
   'kindergarten', 'school', 'mall', 'park', 'gym',
@@ -87,6 +93,7 @@ function FiltersScreen({ onClose }: { onClose: () => void }) {
   const { lang, rtl, haptic } = useTelegram()
 
   const priceOptions = filters.deal_type === 'buy' ? BUY_PRICES : RENT_PRICES
+  const showPool = (filters.property_types ?? []).some(pt => POOL_TYPES.has(pt))
 
   function apply() { haptic('medium'); onClose() }
   function reset()  { haptic('light');  resetFilters() }
@@ -149,11 +156,24 @@ function FiltersScreen({ onClose }: { onClose: () => void }) {
                 onClick={() => {
                   const cur = filters.property_types ?? []
                   const has = cur.includes(value)
-                  setFilters({ property_types: has ? cur.filter(v => v !== value) : [...cur, value] })
+                  const next = has ? cur.filter(v => v !== value) : [...cur, value]
+                  // Clear pool filter if no pool-eligible type remains selected
+                  const poolStillValid = next.some(pt => POOL_TYPES.has(pt))
+                  setFilters({ property_types: next, pool: poolStillValid ? filters.pool : undefined })
                 }}
               />
             ))}
           </div>
+          {/* Pool — only when villa / penthouse / house is selected */}
+          {showPool && (
+            <div className="mt-3">
+              <Toggle
+                label={t('filters_pool', lang)}
+                value={!!filters.pool}
+                onChange={() => setFilters({ pool: filters.pool ? undefined : true })}
+              />
+            </div>
+          )}
         </Section>
 
         <Section title={t('filters_city', lang)}>
@@ -226,8 +246,6 @@ function FiltersScreen({ onClose }: { onClose: () => void }) {
         <Section title={t('filters_extras', lang)}>
           <Toggle label={t('filters_photos', lang)} value={!!filters.with_photos}
             onChange={() => setFilters({ with_photos: filters.with_photos ? undefined : true })} />
-          <Toggle label={t('filters_pool', lang)} value={!!filters.pool}
-            onChange={() => setFilters({ pool: filters.pool ? undefined : true })} />
         </Section>
 
       </div>

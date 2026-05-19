@@ -59,6 +59,9 @@ export const translations = {
   // ── Property types ──────────────────────────────────────────────────────────
   ptype_apartment:    { ru: 'Квартира',     en: 'Apartment',    he: 'דירה',       fr: 'Appartement' },
   ptype_house:        { ru: 'Дом',          en: 'House',        he: 'בית',        fr: 'Maison' },
+  ptype_villa:        { ru: 'Вилла',        en: 'Villa',        he: 'וילה',       fr: 'Villa' },
+  ptype_penthouse:    { ru: 'Пентхаус',     en: 'Penthouse',    he: 'פנטהאוז',    fr: 'Penthouse' },
+  ptype_duplex:       { ru: 'Дуплекс',      en: 'Duplex',       he: 'דופלקס',     fr: 'Duplex' },
   ptype_studio:       { ru: 'Студия',       en: 'Studio',       he: 'סטודיו',     fr: 'Studio' },
   ptype_room:         { ru: 'Комната',      en: 'Room',         he: 'חדר',        fr: 'Chambre' },
   ptype_commercial:   { ru: 'Коммерческая', en: 'Commercial',   he: 'מסחרי',      fr: 'Commercial' },
