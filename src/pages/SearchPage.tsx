@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Sparkles, LayoutGrid, List } from 'lucide-react'
 import { ListingCard } from '@/components/listing/ListingCard'
@@ -7,7 +7,9 @@ import { useStore } from '@/store'
 import { searchListings, aiSearch } from '@/api/listings'
 import { useTelegram } from '@/hooks/useTelegram'
 import { t } from '@/i18n'
-import type { SearchFilters } from '@/types'
+import type { SearchFilters, Listing } from '@/types'
+
+const PAGE_SIZE = 50
 
 export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
   const { filters, setFilters } = useStore()
@@ -16,12 +18,36 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
   const [aiQuery, setAiQuery] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiExplain, setAiExplain] = useState('')
+  const [allListings, setAllListings] = useState<Listing[]>([])
+  const [offset, setOffset] = useState(0)
+  const [total, setTotal] = useState(0)
+  const [loadingMore, setLoadingMore] = useState(false)
 
-  const { data: listings = [], isLoading, isFetching } = useQuery({
+  const { isLoading, isFetching } = useQuery({
     queryKey: ['listings', filters],
-    queryFn: () => searchListings(filters),
+    queryFn: async () => {
+      const result = await searchListings(filters, 0, PAGE_SIZE)
+      setAllListings(result.listings)
+      setTotal(result.total)
+      setOffset(result.listings.length)
+      return result
+    },
     staleTime: 60_000,
   })
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || allListings.length >= total) return
+    setLoadingMore(true)
+    haptic('light')
+    try {
+      const result = await searchListings(filters, offset, PAGE_SIZE)
+      setAllListings(prev => [...prev, ...result.listings])
+      setOffset(prev => prev + result.listings.length)
+      setTotal(result.total)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, allListings.length, total, filters, offset, haptic])
 
   async function handleAiSearch() {
     if (!aiQuery.trim()) return
@@ -31,6 +57,8 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
       const { filters: aiFilters, explanation } = await aiSearch(aiQuery, lang)
       setFilters(aiFilters as Partial<SearchFilters>)
       setAiExplain(explanation)
+      setOffset(0)
+      setAllListings([])
     } catch { /* silent */ } finally {
       setAiLoading(false)
     }
@@ -77,7 +105,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
           <span className="text-sm text-gray-500">
             {isLoading
               ? t('search_loading', lang)
-              : `${listings.length} ${t('search_results', lang)}`}
+              : `${allListings.length}${total > allListings.length ? `/${total}` : ''} ${t('search_results', lang)}`}
             {isFetching && !isLoading && ' ' + t('search_updating', lang)}
           </span>
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
@@ -105,23 +133,38 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
               <div key={i} className="h-52 bg-gray-100 rounded-2xl animate-pulse" />
             ))}
           </div>
-        ) : listings.length === 0 ? (
+        ) : allListings.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-400">
             <Search className="w-12 h-12 mb-3 opacity-30" />
             <p className="text-sm">{t('search_empty', lang)}</p>
             <p className="text-xs mt-1">{t('search_empty_sub', lang)}</p>
           </div>
         ) : (
-          <div className={view === 'grid' ? 'grid grid-cols-2 gap-3 p-4' : 'flex flex-col gap-3 p-4'}>
-            {listings.map((l) => (
-              <ListingCard
-                key={l.id}
-                listing={l}
-                compact={view === 'grid'}
-                onClick={() => { haptic(); onSelect(l.id) }}
-              />
-            ))}
-          </div>
+          <>
+            <div className={view === 'grid' ? 'grid grid-cols-2 gap-3 p-4' : 'flex flex-col gap-3 p-4'}>
+              {allListings.map((l) => (
+                <ListingCard
+                  key={l.id}
+                  listing={l}
+                  compact={view === 'grid'}
+                  onClick={() => { haptic(); onSelect(l.id) }}
+                />
+              ))}
+            </div>
+            {allListings.length < total && (
+              <div className="px-4 pb-6 text-center">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="w-full py-3 bg-blue-50 text-blue-500 font-medium rounded-2xl text-sm disabled:opacity-50"
+                >
+                  {loadingMore
+                    ? t('search_loading', lang)
+                    : `${t('search_load_more', lang)} (${total - allListings.length})`}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -1,9 +1,18 @@
 import { api } from './client'
 import type { Listing, SearchFilters } from '@/types'
 
-export async function searchListings(filters: SearchFilters): Promise<Listing[]> {
-  const { data } = await api.get('/api/miniapp/listings', { params: filters })
-  return data.listings ?? data ?? []
+export async function searchListings(
+  filters: SearchFilters,
+  offset = 0,
+  limit = 50,
+): Promise<{ listings: Listing[]; total: number }> {
+  const { data } = await api.get('/api/miniapp/listings', {
+    params: { ...filters, offset, limit },
+  })
+  return {
+    listings: data.listings ?? [],
+    total: data.total ?? (data.listings?.length ?? 0),
+  }
 }
 
 export async function getListing(id: number): Promise<Listing> {

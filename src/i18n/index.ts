@@ -22,6 +22,7 @@ export const translations = {
   search_updating:    { ru: '· обновляется', en: '· updating', he: '· מתעדכן', fr: '· mise à jour' },
   search_empty:       { ru: 'Ничего не найдено', en: 'Nothing found', he: 'לא נמצאו תוצאות', fr: 'Aucun résultat' },
   search_empty_sub:   { ru: 'Попробуйте изменить фильтры', en: 'Try changing filters', he: 'נסה לשנות את הפילטרים', fr: 'Essayez de modifier les filtres' },
+  search_load_more:   { ru: 'Загрузить ещё', en: 'Load more', he: 'טען עוד', fr: 'Charger plus' },
 
   // ── Filters ─────────────────────────────────────────────────────────────────
   filters_title:      { ru: 'Фильтры',     en: 'Filters',       he: 'פילטרים',    fr: 'Filtres' },

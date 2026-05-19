@@ -41,11 +41,12 @@ export function MapPage({ onSelect }: { onSelect: (id: number) => void }) {
   const { filters } = useStore()
   const { lang } = useTelegram()
 
-  const { data: listings = [], isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['listings', filters],
-    queryFn: () => searchListings(filters),
+    queryFn: () => searchListings(filters, 0, 500),
     staleTime: 60_000,
   })
+  const listings = data?.listings ?? []
 
   const geoListings = listings.filter((l) => l.lat && l.lng)
 
