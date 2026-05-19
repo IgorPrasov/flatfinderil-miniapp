@@ -49,6 +49,7 @@ export interface SearchFilters {
   with_photos?: boolean
   parking_min?: number
   pool?: boolean
+  infrastructure?: string[]
 }
 
 // ── Service provider ───────────────────────────────────────────────────────

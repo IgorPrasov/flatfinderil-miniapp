@@ -7,6 +7,11 @@ import { t } from '@/i18n'
 
 const CITIES = ['Тель-Авив', 'Нетания', 'Хайфа', 'Беэр-Шева', 'Ашдод', 'Петах-Тиква', 'Ришон-ле-Цион', 'Хадера', 'Реховот', 'Холон', 'Раанана', 'Герцлия']
 
+const INFRA_KEYS = [
+  'kindergarten', 'school', 'mall', 'park', 'gym',
+  'hospital', 'beach', 'transport', 'restaurant', 'synagogue', 'public_pool',
+] as const
+
 const PROP_TYPES = [
   { value: 'apartment', key: 'ptype_apartment' },
   { value: 'house',     key: 'ptype_house' },
@@ -164,6 +169,34 @@ export function SearchFiltersPanel() {
                   onChange={(e) => setFilters({ price_max: e.target.value ? +e.target.value : undefined })}
                   className="w-28 border border-gray-200 rounded-xl px-3 py-2 text-sm"
                 />
+              </div>
+            </div>
+
+            {/* Infrastructure */}
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-2">{t('infra_title', lang)}</p>
+              <div className="flex flex-wrap gap-2">
+                {INFRA_KEYS.map((key) => {
+                  const sel = filters.infrastructure?.includes(key)
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        const cur = filters.infrastructure ?? []
+                        setFilters({
+                          infrastructure: sel
+                            ? cur.filter((k) => k !== key)
+                            : [...cur, key],
+                        })
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
+                        sel ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-600'
+                      }`}
+                    >
+                      {t(`infra_${key}` as Parameters<typeof t>[0], lang)}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
