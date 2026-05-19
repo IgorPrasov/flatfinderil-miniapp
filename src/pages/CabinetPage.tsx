@@ -1,6 +1,7 @@
 import { LogIn, Star, Bell, MessageSquare, FileText, ChevronRight } from 'lucide-react'
 import { useTelegram } from '@/hooks/useTelegram'
 import { Button } from '@/components/ui/Button'
+import { LangSelector } from '@/components/ui/LangSelector'
 import { t } from '@/i18n'
 
 export function CabinetPage() {
@@ -71,6 +72,12 @@ export function CabinetPage() {
             <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 ${rtl ? 'rotate-180' : ''}`} />
           </button>
         ))}
+      </div>
+
+      {/* Language selector */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
+        <p className="text-sm font-semibold text-gray-700 mb-3">{t('lang_title', lang)}</p>
+        <LangSelector />
       </div>
 
       <div className="bg-gray-50 rounded-2xl p-4 text-center">

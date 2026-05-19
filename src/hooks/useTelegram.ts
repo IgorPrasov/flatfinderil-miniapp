@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { detectLang, isRTL } from '@/i18n'
 import type { Lang } from '@/i18n'
 import type { TelegramWebApp, TelegramUser } from '@/types'
+import { useStore } from '@/store'
 
 const tg = (): TelegramWebApp | undefined => window.Telegram?.WebApp
 
@@ -25,7 +26,8 @@ export function useTelegram() {
     language_code: 'ru',
   }
 
-  const lang: Lang = detectLang(user?.language_code)
+  const { langOverride } = useStore()
+  const lang: Lang = langOverride ?? detectLang(user?.language_code)
   const rtl = isRTL(lang)
   const isDark = tg()?.colorScheme === 'dark'
 

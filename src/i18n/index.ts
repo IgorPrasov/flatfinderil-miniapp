@@ -150,6 +150,30 @@ export const translations = {
   // ── Compare badge ────────────────────────────────────────────────────────────
   compare_badge:      { ru: 'сравнить',     en: 'compare',      he: 'השווה',      fr: 'comparer' },
   back:               { ru: '← Назад',      en: '← Back',       he: '← חזרה',     fr: '← Retour' },
+
+  // ── Services page ────────────────────────────────────────────────────────────
+  nav_services:       { ru: 'Услуги',       en: 'Services',     he: 'שירותים',    fr: 'Services' },
+  svc_title:          { ru: 'Услуги',       en: 'Services',     he: 'שירותים',    fr: 'Services' },
+  svc_all:            { ru: 'Все',          en: 'All',          he: 'הכל',        fr: 'Tous' },
+  svc_moving:         { ru: '🚚 Перевозки', en: '🚚 Moving',    he: '🚚 הובלות',  fr: '🚚 Déménagement' },
+  svc_cleaning:       { ru: '🧹 Клининг',   en: '🧹 Cleaning',  he: '🧹 ניקיון',  fr: '🧹 Nettoyage' },
+  svc_packing:        { ru: '📦 Упаковка',  en: '📦 Packing',   he: '📦 אריזה',   fr: '📦 Emballage' },
+  svc_repairs:        { ru: '🔧 Ремонт',    en: '🔧 Repairs',   he: '🔧 תיקונים', fr: '🔧 Réparations' },
+  svc_empty:          { ru: 'Нет специалистов в этой категории', en: 'No specialists in this category', he: 'אין מומחים בקטגוריה זו', fr: 'Aucun spécialiste dans cette catégorie' },
+  svc_call:           { ru: 'Позвонить',    en: 'Call',         he: 'התקשר',      fr: 'Appeler' },
+  svc_write:          { ru: 'Написать',     en: 'Write',        he: 'כתוב',       fr: 'Écrire' },
+  svc_per_lead:       { ru: '/лид',         en: '/lead',        he: '/ליד',       fr: '/lead' },
+  svc_per_month:      { ru: '/мес',         en: '/mo',          he: '/חודש',      fr: '/mois' },
+  svc_contact:        { ru: 'Связаться',    en: 'Contact',      he: 'צור קשר',    fr: 'Contacter' },
+  svc_region_all:     { ru: 'Весь Израиль', en: 'All Israel',   he: 'כל ישראל',   fr: 'Tout Israël' },
+  svc_views:          { ru: 'просмотров',   en: 'views',        he: 'צפיות',      fr: 'vues' },
+
+  // ── Language selector ────────────────────────────────────────────────────────
+  lang_title:         { ru: 'Язык',         en: 'Language',     he: 'שפה',        fr: 'Langue' },
+  lang_ru:            { ru: 'Русский',      en: 'Russian',      he: 'רוסית',      fr: 'Russe' },
+  lang_en:            { ru: 'English',      en: 'English',      he: 'אנגלית',     fr: 'Anglais' },
+  lang_he:            { ru: 'עברית',        en: 'Hebrew',       he: 'עברית',      fr: 'Hébreu' },
+  lang_fr:            { ru: 'Français',     en: 'French',       he: 'צרפתית',     fr: 'Français' },
 } as const
 
 export type TranslationKey = keyof typeof translations

@@ -1,4 +1,4 @@
-import { Search, Map, Heart, Calculator, User } from 'lucide-react'
+import { Search, Map, Calculator, User, Wrench } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
@@ -7,7 +7,7 @@ import { t } from '@/i18n'
 const TABS = [
   { id: 'search',     icon: Search,     key: 'nav_search'     },
   { id: 'map',        icon: Map,        key: 'nav_map'        },
-  { id: 'favorites',  icon: Heart,      key: 'nav_favorites'  },
+  { id: 'services',   icon: Wrench,     key: 'nav_services'   },
   { id: 'calculator', icon: Calculator, key: 'nav_calculator' },
   { id: 'cabinet',    icon: User,       key: 'nav_cabinet'    },
 ] as const
@@ -36,7 +36,7 @@ export function BottomNav() {
           >
             <Icon
               className={clsx('w-5 h-5', activeTab === id && 'stroke-2')}
-              fill={activeTab === id && id === 'favorites' ? 'currentColor' : 'none'}
+              fill="none"
             />
             <span>{t(key, lang)}</span>
           </button>

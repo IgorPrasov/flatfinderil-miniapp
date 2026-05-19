@@ -6,6 +6,7 @@ import { MapPage } from '@/pages/MapPage'
 import { FavoritesPage } from '@/pages/FavoritesPage'
 import { CalculatorPage } from '@/pages/CalculatorPage'
 import { CabinetPage } from '@/pages/CabinetPage'
+import { ServicesPage } from '@/pages/ServicesPage'
 import { ListingDetailPage } from '@/pages/ListingDetailPage'
 import { ComparePage } from '@/pages/ComparePage'
 import { useStore } from '@/store'
@@ -82,6 +83,10 @@ function AppContent() {
         ) : activeTab === 'cabinet' ? (
           <div className="h-full overflow-y-auto">
             <CabinetPage />
+          </div>
+        ) : activeTab === 'services' ? (
+          <div className="h-full overflow-y-auto">
+            <ServicesPage />
           </div>
         ) : null}
       </div>
