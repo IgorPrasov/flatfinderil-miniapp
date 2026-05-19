@@ -5,9 +5,10 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { searchListings } from '@/api/listings'
 import { useStore } from '@/store'
+import { useTelegram } from '@/hooks/useTelegram'
+import { t } from '@/i18n'
 import type { Listing } from '@/types'
 
-// Fix default marker icons (Vite issue)
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -18,9 +19,7 @@ L.Icon.Default.mergeOptions({
 function makeIcon(price: number, suspicious: boolean, duplicate: boolean) {
   const color = suspicious ? '#ef4444' : duplicate ? '#f59e0b' : '#3b82f6'
   const label = price > 0
-    ? price >= 1_000_000
-      ? `₪${(price / 1_000_000).toFixed(1)}M`
-      : `₪${Math.round(price / 1000)}K`
+    ? price >= 1_000_000 ? `₪${(price / 1_000_000).toFixed(1)}M` : `₪${Math.round(price / 1000)}K`
     : '?'
   return L.divIcon({
     className: '',
@@ -40,6 +39,7 @@ function FitBounds({ listings }: { listings: Listing[] }) {
 
 export function MapPage({ onSelect }: { onSelect: (id: number) => void }) {
   const { filters } = useStore()
+  const { lang } = useTelegram()
 
   const { data: listings = [], isLoading } = useQuery({
     queryKey: ['listings', filters],
@@ -57,16 +57,8 @@ export function MapPage({ onSelect }: { onSelect: (id: number) => void }) {
         </div>
       )}
 
-      <MapContainer
-        center={[32.0853, 34.7818]} // Tel Aviv
-        zoom={10}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={false}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
-        />
+      <MapContainer center={[32.0853, 34.7818]} zoom={10} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
         {geoListings.length > 0 && <FitBounds listings={geoListings} />}
         {geoListings.map((l) => (
           <Marker
@@ -79,16 +71,15 @@ export function MapPage({ onSelect }: { onSelect: (id: number) => void }) {
               <div className="text-sm">
                 <p className="font-bold">₪{l.price?.toLocaleString()}</p>
                 <p className="text-gray-500">{l.city}</p>
-                {l.rooms && <p>{l.rooms} комн.</p>}
+                {l.rooms && <p>{l.rooms} {t('card_rooms', lang)}</p>}
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
 
-      {/* Counter */}
       <div className="absolute top-4 left-4 z-10 bg-white rounded-xl px-3 py-1.5 shadow-md text-sm font-medium text-gray-700">
-        📍 {geoListings.length} на карте
+        📍 {geoListings.length} {t('map_on_map', lang)}
       </div>
     </div>
   )

@@ -6,11 +6,12 @@ import { SearchFiltersPanel } from '@/components/search/SearchFiltersPanel'
 import { useStore } from '@/store'
 import { searchListings, aiSearch } from '@/api/listings'
 import { useTelegram } from '@/hooks/useTelegram'
+import { t } from '@/i18n'
 import type { SearchFilters } from '@/types'
 
 export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
   const { filters, setFilters } = useStore()
-  const { lang, haptic } = useTelegram()
+  const { lang, haptic, rtl } = useTelegram()
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const [aiQuery, setAiQuery] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
@@ -30,20 +31,16 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
       const { filters: aiFilters, explanation } = await aiSearch(aiQuery, lang)
       setFilters(aiFilters as Partial<SearchFilters>)
       setAiExplain(explanation)
-    } catch {
-      // silently fail
-    } finally {
+    } catch { /* silent */ } finally {
       setAiLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="px-4 pt-4 pb-3 bg-white sticky top-0 z-10 border-b border-gray-50">
-        <h1 className="text-xl font-bold text-gray-900 mb-3">
-          🏠 FlatFinder IL
-        </h1>
+        <h1 className="text-xl font-bold text-gray-900 mb-3">{t('search_title', lang)}</h1>
 
         {/* AI Search */}
         <div className="flex gap-2 mb-3">
@@ -51,7 +48,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
             <Sparkles className="w-4 h-4 text-purple-500 shrink-0" />
             <input
               className="flex-1 bg-transparent py-2.5 text-sm outline-none placeholder-gray-400"
-              placeholder={lang === 'he' ? 'חפש עם AI...' : lang === 'en' ? 'Search with AI...' : 'Поиск с AI... (3 комнаты в ТА до 6000)'}
+              placeholder={t('search_ai_placeholder', lang)}
               value={aiQuery}
               onChange={(e) => setAiQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
@@ -62,7 +59,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
                 disabled={aiLoading}
                 className="text-purple-500 font-medium text-sm"
               >
-                {aiLoading ? '...' : 'Найти'}
+                {aiLoading ? '...' : t('search_ai_find', lang)}
               </button>
             )}
           </div>
@@ -78,8 +75,10 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
         {/* View toggle + count */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-500">
-            {isLoading ? 'Загрузка...' : `${listings.length} объявлений`}
-            {isFetching && !isLoading && ' ·обновляется'}
+            {isLoading
+              ? t('search_loading', lang)
+              : `${listings.length} ${t('search_results', lang)}`}
+            {isFetching && !isLoading && ' ' + t('search_updating', lang)}
           </span>
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
             <button
@@ -109,26 +108,17 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
         ) : listings.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-400">
             <Search className="w-12 h-12 mb-3 opacity-30" />
-            <p className="text-sm">Ничего не найдено</p>
-            <p className="text-xs mt-1">Попробуйте изменить фильтры</p>
+            <p className="text-sm">{t('search_empty', lang)}</p>
+            <p className="text-xs mt-1">{t('search_empty_sub', lang)}</p>
           </div>
         ) : (
-          <div
-            className={
-              view === 'grid'
-                ? 'grid grid-cols-2 gap-3 p-4'
-                : 'flex flex-col gap-3 p-4'
-            }
-          >
+          <div className={view === 'grid' ? 'grid grid-cols-2 gap-3 p-4' : 'flex flex-col gap-3 p-4'}>
             {listings.map((l) => (
               <ListingCard
                 key={l.id}
                 listing={l}
                 compact={view === 'grid'}
-                onClick={() => {
-                  haptic('light')
-                  onSelect(l.id)
-                }}
+                onClick={() => { haptic(); onSelect(l.id) }}
               />
             ))}
           </div>

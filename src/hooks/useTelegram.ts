@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { detectLang, isRTL } from '@/i18n'
+import type { Lang } from '@/i18n'
 import type { TelegramWebApp, TelegramUser } from '@/types'
 
 const tg = (): TelegramWebApp | undefined => window.Telegram?.WebApp
@@ -13,7 +15,6 @@ export function useTelegram() {
       app.expand()
       setReady(true)
     } else {
-      // Dev mode — no Telegram
       setReady(true)
     }
   }, [])
@@ -24,12 +25,8 @@ export function useTelegram() {
     language_code: 'ru',
   }
 
-  const lang = user?.language_code?.startsWith('he')
-    ? 'he'
-    : user?.language_code?.startsWith('en')
-    ? 'en'
-    : 'ru'
-
+  const lang: Lang = detectLang(user?.language_code)
+  const rtl = isRTL(lang)
   const isDark = tg()?.colorScheme === 'dark'
 
   function haptic(type: 'light' | 'medium' | 'heavy' = 'light') {
@@ -50,10 +47,7 @@ export function useTelegram() {
     return () => btn.offClick(onClick)
   }
 
-  function hideMainButton() {
-    tg()?.MainButton?.hide()
-  }
-
+  function hideMainButton() { tg()?.MainButton?.hide() }
   function showBackButton(onClick: () => void) {
     const btn = tg()?.BackButton
     if (!btn) return
@@ -61,22 +55,11 @@ export function useTelegram() {
     btn.onClick(onClick)
     return () => btn.offClick(onClick)
   }
-
-  function hideBackButton() {
-    tg()?.BackButton?.hide()
-  }
+  function hideBackButton() { tg()?.BackButton?.hide() }
 
   return {
-    ready,
-    user,
-    lang,
-    isDark,
-    haptic,
-    notify,
-    showMainButton,
-    hideMainButton,
-    showBackButton,
-    hideBackButton,
+    ready, user, lang, rtl, isDark, haptic, notify,
+    showMainButton, hideMainButton, showBackButton, hideBackButton,
     initData: tg()?.initData ?? '',
     webapp: tg(),
   }

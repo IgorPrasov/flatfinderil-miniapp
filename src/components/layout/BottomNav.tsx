@@ -2,23 +2,27 @@ import { Search, Map, Heart, Calculator, User } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
+import { t } from '@/i18n'
 
 const TABS = [
-  { id: 'search',     icon: Search,     label: { ru: 'Поиск',     he: 'חיפוש',   en: 'Search' } },
-  { id: 'map',        icon: Map,        label: { ru: 'Карта',     he: 'מפה',     en: 'Map' } },
-  { id: 'favorites',  icon: Heart,      label: { ru: 'Избранное', he: 'מועדפים', en: 'Saved' } },
-  { id: 'calculator', icon: Calculator, label: { ru: 'Ипотека',   he: 'משכנתה',  en: 'Mortgage' } },
-  { id: 'cabinet',    icon: User,       label: { ru: 'Кабинет',   he: 'אזור אישי', en: 'Cabinet' } },
+  { id: 'search',     icon: Search,     key: 'nav_search'     },
+  { id: 'map',        icon: Map,        key: 'nav_map'        },
+  { id: 'favorites',  icon: Heart,      key: 'nav_favorites'  },
+  { id: 'calculator', icon: Calculator, key: 'nav_calculator' },
+  { id: 'cabinet',    icon: User,       key: 'nav_cabinet'    },
 ] as const
 
 export function BottomNav() {
   const { activeTab, setActiveTab } = useStore()
-  const { lang, haptic } = useTelegram()
+  const { lang, haptic, rtl } = useTelegram()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-bottom z-40">
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-bottom z-40"
+      dir={rtl ? 'rtl' : 'ltr'}
+    >
       <div className="flex items-stretch">
-        {TABS.map(({ id, icon: Icon, label }) => (
+        {TABS.map(({ id, icon: Icon, key }) => (
           <button
             key={id}
             className={clsx(
@@ -34,7 +38,7 @@ export function BottomNav() {
               className={clsx('w-5 h-5', activeTab === id && 'stroke-2')}
               fill={activeTab === id && id === 'favorites' ? 'currentColor' : 'none'}
             />
-            <span>{label[lang as keyof typeof label] ?? label.ru}</span>
+            <span>{t(key, lang)}</span>
           </button>
         ))}
       </div>

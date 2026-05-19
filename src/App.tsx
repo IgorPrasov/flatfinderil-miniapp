@@ -10,19 +10,15 @@ import { ListingDetailPage } from '@/pages/ListingDetailPage'
 import { ComparePage } from '@/pages/ComparePage'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
+import { t } from '@/i18n'
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 })
 
 function AppContent() {
   const { activeTab } = useStore()
-  const { ready } = useTelegram()
+  const { ready, lang, rtl } = useTelegram()
   const [detailId, setDetailId] = useState<number | null>(null)
   const [showCompare, setShowCompare] = useState(false)
   const { compareList } = useStore()
@@ -45,14 +41,14 @@ function AppContent() {
   }
 
   return (
-    <div className="flex flex-col h-dvh relative">
+    <div className="flex flex-col h-dvh relative" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Compare badge */}
       {compareList.length > 0 && !showCompare && (
         <button
           onClick={() => setShowCompare(true)}
           className="fixed top-4 right-4 z-30 bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
         >
-          📊 {compareList.length} сравнить
+          📊 {compareList.length} {t('compare_badge', lang)}
         </button>
       )}
 
@@ -60,24 +56,24 @@ function AppContent() {
       <div className="flex-1 overflow-hidden">
         {showCompare ? (
           <div className="h-full overflow-y-auto">
-            <div className="p-4 pt-3">
+            <div className="px-4 pt-3">
               <button onClick={() => setShowCompare(false)} className="text-blue-500 text-sm mb-2">
-                ← Назад
+                {t('back', lang)}
               </button>
             </div>
             <ComparePage />
           </div>
         ) : activeTab === 'search' ? (
           <div className="h-full overflow-y-auto">
-            <SearchPage onSelect={(id) => setDetailId(id)} />
+            <SearchPage onSelect={setDetailId} />
           </div>
         ) : activeTab === 'map' ? (
           <div className="h-full">
-            <MapPage onSelect={(id) => setDetailId(id)} />
+            <MapPage onSelect={setDetailId} />
           </div>
         ) : activeTab === 'favorites' ? (
           <div className="h-full overflow-y-auto">
-            <FavoritesPage onSelect={(id) => setDetailId(id)} />
+            <FavoritesPage onSelect={setDetailId} />
           </div>
         ) : activeTab === 'calculator' ? (
           <div className="h-full overflow-y-auto">
