@@ -1,4 +1,4 @@
-import { Heart, MapPin, AlertTriangle, Copy } from 'lucide-react'
+import { Heart, MapPin, AlertTriangle, Copy, BedDouble, Maximize2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
@@ -18,7 +18,7 @@ export function ListingCard({ listing, onClick, compact }: Props) {
   const isFav = favoriteIds.has(listing.id)
   const inCompare = compareList.some((l) => l.id === listing.id)
 
-  const photo = listing.photos?.find((p) => p.length > 20) ?? listing.photos?.[0]
+  const photoCount = listing.photos?.filter((p) => p.length > 20).length ?? 0
 
   const price = listing.price
     ? listing.deal_type === 'rent'
@@ -28,96 +28,113 @@ export function ListingCard({ listing, onClick, compact }: Props) {
 
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+      className={clsx(
+        'bg-white rounded-2xl shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform overflow-hidden',
+        compact ? 'p-3' : 'p-4'
+      )}
       onClick={onClick}
     >
-      {/* Photo */}
-      <div className={clsx('relative bg-gray-100', compact ? 'h-36' : 'h-48')}>
-        {photo ? (
-          <img src={photo} alt="" className="w-full h-full object-cover" loading="lazy" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl">🏠</div>
-        )}
-
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
-          {listing.is_suspicious && (
-            <Badge color="red">
-              <AlertTriangle className="w-3 h-3 mr-1" />
-              {t('card_suspicious', lang)}
-            </Badge>
+      {/* Top row: price + fav */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className={clsx('font-bold text-gray-900 leading-tight', compact ? 'text-base' : 'text-lg')}>
+            {price}
+          </p>
+          {listing.deal_type && (
+            <span className={clsx(
+              'inline-block mt-0.5 text-xs px-2 py-0.5 rounded-full font-medium',
+              listing.deal_type === 'rent'
+                ? 'bg-blue-50 text-blue-600'
+                : 'bg-green-50 text-green-600'
+            )}>
+              {listing.deal_type === 'rent' ? t('filters_rent', lang) : t('filters_buy', lang)}
+            </span>
           )}
-          {listing.is_duplicate && (
-            <Badge color="yellow">
-              <Copy className="w-3 h-3 mr-1" />
-              {t('card_duplicate', lang)}
-            </Badge>
-          )}
-          {listing.poster_type === 'private' && <Badge color="green">{t('card_private', lang)}</Badge>}
-          {listing.poster_type === 'agent' && <Badge color="blue">{t('card_agent', lang)}</Badge>}
         </div>
 
-        {/* Favorite */}
         <button
           className={clsx(
-            'absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center',
-            isFav ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-500'
+            'shrink-0 w-8 h-8 rounded-full flex items-center justify-center border transition-colors',
+            isFav
+              ? 'bg-red-500 border-red-500 text-white'
+              : 'bg-white border-gray-200 text-gray-400'
           )}
-          onClick={(e) => {
-            e.stopPropagation()
-            haptic()
-            toggleFavorite(listing.id)
-          }}
+          onClick={(e) => { e.stopPropagation(); haptic(); toggleFavorite(listing.id) }}
         >
           <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
         </button>
+      </div>
 
-        {/* AI Score */}
+      {/* Location */}
+      <div className="flex items-center gap-1 text-gray-500 text-sm mt-2">
+        <MapPin className="w-3.5 h-3.5 shrink-0 text-gray-400" />
+        <span className="truncate">
+          {listing.city}{listing.district ? `, ${listing.district}` : ''}
+          {listing.address ? ` · ${listing.address}` : ''}
+        </span>
+      </div>
+
+      {/* Stats row */}
+      <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
+        {listing.rooms != null && (
+          <span className="flex items-center gap-1">
+            <BedDouble className="w-3.5 h-3.5 text-gray-400" />
+            {listing.rooms} {t('card_rooms', lang)}
+          </span>
+        )}
+        {listing.area != null && (
+          <span className="flex items-center gap-1">
+            <Maximize2 className="w-3.5 h-3.5 text-gray-400" />
+            {listing.area} м²
+          </span>
+        )}
+        {listing.floor != null && (
+          <span className="text-gray-400 text-xs">
+            {listing.floor}{listing.floors_total ? `/${listing.floors_total}` : ''} {t('card_floor', lang)}
+          </span>
+        )}
+      </div>
+
+      {/* Badges + photo count */}
+      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+        {listing.is_suspicious && (
+          <Badge color="red">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            {t('card_suspicious', lang)}
+          </Badge>
+        )}
+        {listing.is_duplicate && (
+          <Badge color="yellow">
+            <Copy className="w-3 h-3 mr-1" />
+            {t('card_duplicate', lang)}
+          </Badge>
+        )}
+        {listing.poster_type === 'private' && <Badge color="green">{t('card_private', lang)}</Badge>}
+        {listing.poster_type === 'agent'   && <Badge color="blue">{t('card_agent', lang)}</Badge>}
+        {photoCount > 0 && (
+          <span className="text-xs text-gray-400 ml-auto">
+            📷 {photoCount}
+          </span>
+        )}
         {listing.ai_score != null && (
-          <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
-            AI {listing.ai_score}
-          </div>
+          <span className="text-xs text-purple-500 font-medium">AI {listing.ai_score}</span>
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-3">
-        <div className="flex items-start justify-between gap-2">
-          <p className="font-bold text-lg text-gray-900 leading-tight">{price}</p>
-        </div>
-
-        <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-          <MapPin className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">{listing.city}{listing.district ? `, ${listing.district}` : ''}</span>
-        </div>
-
-        {!compact && (
-          <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
-            {listing.rooms && (
-              <span>{listing.rooms} {t('card_rooms', lang)}</span>
-            )}
-            {listing.area && <span>{listing.area} м²</span>}
-            {listing.floor != null && listing.floors_total && (
-              <span className="text-gray-400">{listing.floor}/{listing.floors_total} {t('card_floor', lang)}</span>
-            )}
-          </div>
-        )}
-
-        {!compact && (
-          <button
-            className={clsx(
-              'mt-2 text-xs px-2 py-1 rounded-lg transition-colors',
-              inCompare ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
-            )}
-            onClick={(e) => {
-              e.stopPropagation()
-              addToCompare(listing)
-            }}
-          >
-            {inCompare ? t('card_compare_in', lang) : t('card_compare_add', lang)}
-          </button>
-        )}
-      </div>
+      {/* Compare button — only in list mode */}
+      {!compact && (
+        <button
+          className={clsx(
+            'mt-3 w-full py-1.5 rounded-xl text-xs font-medium border transition-colors',
+            inCompare
+              ? 'border-blue-400 bg-blue-50 text-blue-600'
+              : 'border-gray-200 text-gray-400 hover:text-gray-600'
+          )}
+          onClick={(e) => { e.stopPropagation(); addToCompare(listing) }}
+        >
+          {inCompare ? t('card_compare_in', lang) : t('card_compare_add', lang)}
+        </button>
+      )}
     </div>
   )
 }

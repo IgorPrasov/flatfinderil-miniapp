@@ -21,6 +21,7 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
   const { favoriteIds, toggleFavorite, addToCompare, compareList } = useStore()
   const { user, haptic, notify, webapp, lang, rtl } = useTelegram()
   const [photoIdx, setPhotoIdx] = useState(0)
+  const [showPhotos, setShowPhotos] = useState(false)
   const [showBooking, setShowBooking] = useState(false)
   const [bookDate, setBookDate] = useState('')
   const [bookMsg, setBookMsg] = useState('')
@@ -79,52 +80,72 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-24" dir={rtl ? 'rtl' : 'ltr'}>
-      {/* Photos */}
-      <div className="relative h-64 bg-gray-100 shrink-0">
-        {photos.length > 0 ? (
-          <>
-            <img src={photos[photoIdx]} alt="" className="w-full h-full object-cover" />
-            {photos.length > 1 && (
-              <>
-                <button
-                  onClick={() => setPhotoIdx((i) => Math.max(0, i - 1))}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center"
-                  disabled={photoIdx === 0}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1))}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center"
-                  disabled={photoIdx === photos.length - 1}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
-                  {photos.map((_, i) => (
-                    <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === photoIdx ? 'bg-white' : 'bg-white/50'}`} />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl">🏠</div>
-        )}
 
-        {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3">
-          <button onClick={onBack} className="w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center">
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => { haptic(); toggleFavorite(listingId) }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${isFav ? 'bg-red-500 text-white' : 'bg-black/40 text-white'}`}
-          >
-            <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
-          </button>
-        </div>
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-50 shrink-0">
+        <button onClick={onBack} className="flex items-center gap-1 text-blue-500 font-medium text-sm py-1">
+          <ArrowLeft className="w-4 h-4" />
+          {t('back', lang)}
+        </button>
+        <button
+          onClick={() => { haptic(); toggleFavorite(listingId) }}
+          className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors ${
+            isFav ? 'bg-red-500 border-red-500 text-white' : 'border-gray-200 text-gray-400'
+          }`}
+        >
+          <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
+        </button>
       </div>
+
+      {/* Photos section */}
+      {photos.length > 0 && (
+        <div className="shrink-0">
+          {!showPhotos ? (
+            /* Show photos button */
+            <button
+              onClick={() => { haptic('light'); setShowPhotos(true) }}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-gray-50 border-b border-gray-100 text-blue-500 font-medium text-sm active:bg-gray-100"
+            >
+              <span className="text-lg">📷</span>
+              {t('detail_show_photos', lang)} ({photos.length})
+            </button>
+          ) : (
+            /* Carousel */
+            <div className="relative h-64 bg-gray-100">
+              <img src={photos[photoIdx]} alt="" className="w-full h-full object-cover" />
+              {photos.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setPhotoIdx((i) => Math.max(0, i - 1))}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center disabled:opacity-30"
+                    disabled={photoIdx === 0}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1))}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center disabled:opacity-30"
+                    disabled={photoIdx === photos.length - 1}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                    {photos.map((_, i) => (
+                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === photoIdx ? 'bg-white' : 'bg-white/50'}`} />
+                    ))}
+                  </div>
+                </>
+              )}
+              <button
+                onClick={() => setShowPhotos(false)}
+                className="absolute top-2 right-2 w-7 h-7 bg-black/40 text-white rounded-full flex items-center justify-center text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-4 space-y-4">

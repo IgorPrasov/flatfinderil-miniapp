@@ -90,6 +90,7 @@ export const translations = {
   detail_amenities:   { ru: 'Удобства',     en: 'Amenities',    he: 'מתקנים',     fr: 'Commodités' },
   detail_seller:      { ru: 'Продавец',     en: 'Seller',       he: 'מוכר',       fr: 'Vendeur' },
   detail_contact:     { ru: 'Связаться',    en: 'Contact',      he: 'צור קשר',    fr: 'Contacter' },
+  detail_show_photos: { ru: 'Показать фото', en: 'Show photos',  he: 'הצג תמונות',  fr: 'Voir les photos' },
   detail_booking:     { ru: 'Просмотр',     en: 'Book viewing', he: 'תיאום ביקור', fr: 'Visite' },
   detail_booking_title: { ru: '📅 Записаться на просмотр', en: '📅 Book a viewing', he: '📅 קביעת ביקור', fr: '📅 Réserver une visite' },
   detail_date:        { ru: 'Дата и время', en: 'Date & time',  he: 'תאריך ושעה', fr: 'Date et heure' },
