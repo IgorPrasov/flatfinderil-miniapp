@@ -68,12 +68,19 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
     <div className="flex flex-col h-full" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="px-4 pt-4 pb-3 bg-white sticky top-0 z-10 border-b border-gray-50">
-        <h1 className="text-xl font-bold text-gray-900 mb-3">{t('search_title', lang)}</h1>
+        {/* Logo + Brand */}
+        <div className="flex items-center gap-2 mb-3">
+          <img src="/logo.png" alt="FlatFinder IL" className="w-8 h-8 rounded-xl" />
+          <div>
+            <h1 className="text-base font-bold text-brand leading-none">FlatFinder IL</h1>
+            <p className="text-[10px] text-gray-400 leading-none mt-0.5">{t('search_title', lang)}</p>
+          </div>
+        </div>
 
         {/* AI Search */}
         <div className="flex gap-2 mb-3">
           <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-xl px-3">
-            <Sparkles className="w-4 h-4 text-purple-500 shrink-0" />
+            <Sparkles className="w-4 h-4 text-brand shrink-0" />
             <input
               className="flex-1 bg-transparent py-2.5 text-sm outline-none placeholder-gray-400"
               placeholder={t('search_ai_placeholder', lang)}
@@ -85,7 +92,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
               <button
                 onClick={handleAiSearch}
                 disabled={aiLoading}
-                className="text-purple-500 font-medium text-sm"
+                className="text-brand font-medium text-sm"
               >
                 {aiLoading ? '...' : t('search_ai_find', lang)}
               </button>
@@ -95,7 +102,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
         </div>
 
         {aiExplain && (
-          <p className="text-xs text-purple-600 bg-purple-50 rounded-lg px-3 py-2 mb-2">
+          <p className="text-xs text-brand bg-brand-light rounded-lg px-3 py-2 mb-2">
             🤖 {aiExplain}
           </p>
         )}
@@ -156,7 +163,7 @@ export function SearchPage({ onSelect }: { onSelect: (id: number) => void }) {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="w-full py-3 bg-blue-50 text-blue-500 font-medium rounded-2xl text-sm disabled:opacity-50"
+                  className="w-full py-3 bg-brand-light text-brand font-medium rounded-2xl text-sm disabled:opacity-50"
                 >
                   {loadingMore
                     ? t('search_loading', lang)

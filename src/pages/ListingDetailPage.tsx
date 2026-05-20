@@ -83,14 +83,14 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-50 shrink-0">
-        <button onClick={onBack} className="flex items-center gap-1 text-blue-500 font-medium text-sm py-1">
+        <button onClick={onBack} className="flex items-center gap-1 text-brand font-medium text-sm py-1">
           <ArrowLeft className="w-4 h-4" />
           {t('back', lang)}
         </button>
         <button
           onClick={() => { haptic(); toggleFavorite(listingId) }}
           className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors ${
-            isFav ? 'bg-red-500 border-red-500 text-white' : 'border-gray-200 text-gray-400'
+            isFav ? 'bg-red-500 border-red-500 text-white' : 'border-gray-200 text-gray-300'
           }`}
         >
           <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
@@ -214,14 +214,14 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
 
         {/* AI Valuation */}
         {ai?.valuation && (
-          <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4">
+          <div className="bg-brand-light border border-brand/20 rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-purple-600" />
-              <p className="text-sm font-semibold text-purple-700">{t('detail_ai_title', lang)}</p>
+              <TrendingUp className="w-4 h-4 text-brand" />
+              <p className="text-sm font-semibold text-brand">{t('detail_ai_title', lang)}</p>
             </div>
-            <p className="text-lg font-bold text-purple-900">
+            <p className="text-lg font-bold text-brand-dark">
               ₪{ai.valuation.toLocaleString()}
-              {listing.deal_type === 'rent' && <span className="text-sm font-normal text-purple-600">{t('card_per_month', lang)}</span>}
+              {listing.deal_type === 'rent' && <span className="text-sm font-normal text-brand">{t('card_per_month', lang)}</span>}
             </p>
             {priceDiff !== null && (
               <p className={`text-sm mt-1 ${priceDiff > 10 ? 'text-red-600' : priceDiff < -10 ? 'text-green-600' : 'text-gray-600'}`}>
@@ -285,7 +285,7 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
         <button
           onClick={() => { haptic(); listing && addToCompare(listing) }}
           className={`w-full py-2.5 rounded-xl text-sm font-medium border transition-colors ${
-            inCompare ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-600'
+            inCompare ? 'border-brand bg-brand-light text-brand' : 'border-gray-200 text-gray-600'
           }`}
         >
           <GitCompare className="w-4 h-4 inline mr-2" />

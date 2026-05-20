@@ -53,7 +53,7 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
       onClick={onClick}
       className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
         active
-          ? 'border-blue-500 bg-blue-500 text-white font-medium'
+          ? 'border-brand bg-brand text-white font-medium'
           : 'border-gray-200 bg-white text-gray-700 active:bg-gray-50'
       }`}
     >
@@ -68,7 +68,7 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
   return (
     <button type="button" onClick={onChange} className="flex items-center justify-between w-full py-3 border-b border-gray-50">
       <span className="text-sm text-gray-800">{label}</span>
-      <div className={`relative w-11 h-6 rounded-full transition-colors ${value ? 'bg-blue-500' : 'bg-gray-200'}`}>
+      <div className={`relative w-11 h-6 rounded-full transition-colors ${value ? 'bg-brand' : 'bg-gray-200'}`}>
         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
       </div>
     </button>
@@ -255,7 +255,7 @@ function FiltersScreen({ onClose }: { onClose: () => void }) {
         <button
           type="button"
           onClick={apply}
-          className="w-full py-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white text-base font-bold rounded-2xl transition-colors"
+          className="w-full py-4 bg-brand hover:bg-brand-dark active:bg-brand-dark text-white text-base font-bold rounded-2xl transition-colors"
         >
           🔍 {t('filters_apply', lang)}
           {activeCount > 0 && ` · ${activeCount}`}
@@ -294,7 +294,7 @@ export function SearchFiltersPanel() {
         <SlidersHorizontal className="w-4 h-4" />
         {t('filters_title', lang)}
         {activeCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold px-1">
+          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-brand text-white text-xs rounded-full flex items-center justify-center font-bold px-1">
             {activeCount}
           </span>
         )}

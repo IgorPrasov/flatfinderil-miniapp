@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand:       #863bff;
+  --color-brand-dark:  #7e14ff;
+  --color-brand-light: #ede6ff;
+  --color-accent:      #47bfff;
+}
+
 @layer base {
   :root {
     --tg-theme-bg-color: #ffffff;

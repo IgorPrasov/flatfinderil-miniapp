@@ -117,7 +117,7 @@ export function ListingCard({ listing, onClick, compact }: Props) {
           </span>
         )}
         {listing.ai_score != null && (
-          <span className="text-xs text-purple-500 font-medium">AI {listing.ai_score}</span>
+          <span className="text-xs text-brand font-medium">AI {listing.ai_score}</span>
         )}
       </div>
 
@@ -127,7 +127,7 @@ export function ListingCard({ listing, onClick, compact }: Props) {
           className={clsx(
             'mt-3 w-full py-1.5 rounded-xl text-xs font-medium border transition-colors',
             inCompare
-              ? 'border-blue-400 bg-blue-50 text-blue-600'
+              ? 'border-brand bg-brand-light text-brand'
               : 'border-gray-200 text-gray-400 hover:text-gray-600'
           )}
           onClick={(e) => { e.stopPropagation(); addToCompare(listing) }}

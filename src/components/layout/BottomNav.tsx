@@ -27,7 +27,7 @@ export function BottomNav() {
             key={id}
             className={clsx(
               'flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-xs transition-colors',
-              activeTab === id ? 'text-blue-500' : 'text-gray-400'
+              activeTab === id ? 'text-brand' : 'text-gray-400'
             )}
             onClick={() => {
               haptic('light')
