@@ -110,38 +110,60 @@ export function ListingDetailPage({ listingId, onBack }: Props) {
               {t('detail_show_photos', lang)} ({photos.length})
             </button>
           ) : (
-            /* Carousel */
-            <div className="relative h-64 bg-gray-100">
-              <img src={photos[photoIdx]} alt="" className="w-full h-full object-cover" />
+            /* Full photo viewer */
+            <div className="bg-black">
+              {/* Photo — natural size, contained */}
+              <div className="relative flex items-center justify-center"
+                   style={{ minHeight: '240px', maxHeight: '70dvh' }}>
+                <img
+                  src={photos[photoIdx]}
+                  alt=""
+                  className="w-full max-h-[70dvh] object-contain"
+                  style={{ display: 'block' }}
+                />
+
+                {/* Prev / Next */}
+                {photos.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setPhotoIdx((i) => Math.max(0, i - 1))}
+                      disabled={photoIdx === 0}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 text-white rounded-full flex items-center justify-center disabled:opacity-20"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1))}
+                      disabled={photoIdx === photos.length - 1}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 text-white rounded-full flex items-center justify-center disabled:opacity-20"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
+                {/* Close */}
+                <button
+                  onClick={() => setShowPhotos(false)}
+                  className="absolute top-2 right-2 w-8 h-8 bg-black/60 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Dots + counter */}
               {photos.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setPhotoIdx((i) => Math.max(0, i - 1))}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center disabled:opacity-30"
-                    disabled={photoIdx === 0}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1))}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center disabled:opacity-30"
-                    disabled={photoIdx === photos.length - 1}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
-                    {photos.map((_, i) => (
-                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === photoIdx ? 'bg-white' : 'bg-white/50'}`} />
-                    ))}
-                  </div>
-                </>
+                <div className="flex items-center justify-center gap-1.5 py-2">
+                  {photos.length <= 10
+                    ? photos.map((_, i) => (
+                        <button key={i} onClick={() => setPhotoIdx(i)}
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${i === photoIdx ? 'bg-white' : 'bg-white/30'}`}
+                        />
+                      ))
+                    : <span className="text-white/70 text-xs">{photoIdx + 1} / {photos.length}</span>
+                  }
+                </div>
               )}
-              <button
-                onClick={() => setShowPhotos(false)}
-                className="absolute top-2 right-2 w-7 h-7 bg-black/40 text-white rounded-full flex items-center justify-center text-xs"
-              >
-                ✕
-              </button>
             </div>
           )}
         </div>
