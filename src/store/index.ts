@@ -58,7 +58,7 @@ export const useStore = create<AppState>()(
           return { favoriteIds: next }
         }),
 
-      activeTab: 'search',
+      activeTab: 'map',
       setActiveTab: (tab) => set({ activeTab: tab }),
     }),
     {

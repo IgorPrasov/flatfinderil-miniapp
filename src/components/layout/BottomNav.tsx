@@ -5,8 +5,8 @@ import { useTelegram } from '@/hooks/useTelegram'
 import { t } from '@/i18n'
 
 const TABS = [
-  { id: 'search',     icon: Search,     key: 'nav_search'     },
   { id: 'map',        icon: Map,        key: 'nav_map'        },
+  { id: 'search',     icon: Search,     key: 'nav_search'     },
   { id: 'services',   icon: Wrench,     key: 'nav_services'   },
   { id: 'calculator', icon: Calculator, key: 'nav_calculator' },
   { id: 'cabinet',    icon: User,       key: 'nav_cabinet'    },
