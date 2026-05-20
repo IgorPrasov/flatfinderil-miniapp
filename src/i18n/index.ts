@@ -227,6 +227,7 @@ export const translations = {
   docs_address:        { ru: 'Адрес объекта', en: 'Property address', he: 'כתובת הנכס', fr: 'Adresse du bien' },
   docs_area:           { ru: 'Площадь (м²)', en: 'Area (m²)',    he: 'שטח (מ"ר)',  fr: 'Surface (m²)' },
   docs_price:          { ru: 'Сумма (₪)',    en: 'Amount (₪)',   he: 'סכום (₪)',   fr: 'Montant (₪)' },
+  docs_rent_price:     { ru: 'Аренда (₪/мес)', en: 'Rent (₪/mo)', he: 'שכירות (₪/חודש)', fr: 'Loyer (₪/mois)' },
   docs_deposit:        { ru: 'Залог (₪)',    en: 'Deposit (₪)',  he: 'פיקדון (₪)', fr: 'Dépôt de garantie (₪)' },
   docs_date_start:     { ru: 'Дата начала',  en: 'Start date',   he: 'תאריך התחלה', fr: 'Date de début' },
   docs_date_end:       { ru: 'Дата окончания', en: 'End date',   he: 'תאריך סיום', fr: 'Date de fin' },
