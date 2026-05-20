@@ -30,9 +30,10 @@ const PROP_TYPES = [
 // Property types where pool filter makes sense
 const POOL_TYPES = new Set(['villa', 'penthouse', 'house'])
 
+// Must match config.py INFRASTRUCTURE keys in the bot — no public_pool there
 const INFRA_KEYS = [
   'kindergarten', 'school', 'mall', 'park', 'gym',
-  'hospital', 'beach', 'transport', 'restaurant', 'synagogue', 'public_pool',
+  'hospital', 'beach', 'transport', 'restaurant', 'synagogue',
 ] as const
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
