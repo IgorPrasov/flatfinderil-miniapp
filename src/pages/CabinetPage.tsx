@@ -1,11 +1,14 @@
-import { LogIn, Star, Bell, MessageSquare, FileText, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { LogIn, Star, Bell, MessageSquare, Calculator, ChevronRight, ChevronDown } from 'lucide-react'
 import { useTelegram } from '@/hooks/useTelegram'
 import { Button } from '@/components/ui/Button'
 import { LangSelector } from '@/components/ui/LangSelector'
+import { CalculatorPage } from '@/pages/CalculatorPage'
 import { t } from '@/i18n'
 
 export function CabinetPage() {
   const { user, webapp, lang, rtl } = useTelegram()
+  const [showCalc, setShowCalc] = useState(false)
   const isLoggedIn = user && user.id !== 0
 
   function openBot() {
@@ -13,10 +16,10 @@ export function CabinetPage() {
   }
 
   const MENU = [
-    { icon: Star,         labelKey: 'cabinet_subscriptions', subKey: 'cabinet_sub_sub' },
-    { icon: Bell,         labelKey: 'cabinet_notifications', subKey: 'cabinet_notif_sub' },
-    { icon: MessageSquare,labelKey: 'cabinet_listings',      subKey: 'cabinet_listings_sub' },
-    { icon: FileText,     labelKey: 'cabinet_docs',          subKey: 'cabinet_docs_sub' },
+    { icon: Star,         labelKey: 'cabinet_subscriptions', subKey: 'cabinet_sub_sub',    action: openBot },
+    { icon: Bell,         labelKey: 'cabinet_notifications', subKey: 'cabinet_notif_sub',  action: openBot },
+    { icon: MessageSquare,labelKey: 'cabinet_listings',      subKey: 'cabinet_listings_sub', action: openBot },
+    { icon: Calculator,   labelKey: 'nav_calculator',        subKey: 'calc_title',          action: () => setShowCalc((v) => !v) },
   ] as const
 
   return (
@@ -56,21 +59,31 @@ export function CabinetPage() {
 
       {/* Menu */}
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-4">
-        {MENU.map(({ icon: Icon, labelKey, subKey }, i) => (
-          <button
-            key={labelKey}
-            onClick={openBot}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors ${i > 0 ? 'border-t border-gray-50' : ''}`}
-          >
-            <div className="w-9 h-9 bg-brand-light rounded-xl flex items-center justify-center shrink-0">
-              <Icon className="w-4 h-4 text-brand" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800">{t(labelKey, lang)}</p>
-              <p className="text-xs text-gray-400">{t(subKey, lang)}</p>
-            </div>
-            <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 ${rtl ? 'rotate-180' : ''}`} />
-          </button>
+        {MENU.map(({ icon: Icon, labelKey, subKey, action }, i) => (
+          <div key={labelKey}>
+            <button
+              onClick={action}
+              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors ${i > 0 ? 'border-t border-gray-50' : ''}`}
+            >
+              <div className="w-9 h-9 bg-brand-light rounded-xl flex items-center justify-center shrink-0">
+                <Icon className="w-4 h-4 text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800">{t(labelKey, lang)}</p>
+                <p className="text-xs text-gray-400">{t(subKey, lang)}</p>
+              </div>
+              {labelKey === 'nav_calculator'
+                ? (showCalc
+                    ? <ChevronDown className="w-4 h-4 text-brand shrink-0" />
+                    : <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 ${rtl ? 'rotate-180' : ''}`} />)
+                : <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 ${rtl ? 'rotate-180' : ''}`} />}
+            </button>
+            {labelKey === 'nav_calculator' && showCalc && (
+              <div className="border-t border-gray-50 bg-gray-50/50 px-2 py-2">
+                <CalculatorPage />
+              </div>
+            )}
+          </div>
         ))}
       </div>
 

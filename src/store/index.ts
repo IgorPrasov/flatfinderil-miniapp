@@ -24,7 +24,7 @@ interface AppState {
   toggleFavorite: (id: number) => void
 
   // Active tab
-  activeTab: 'search' | 'map' | 'favorites' | 'calculator' | 'cabinet' | 'services'
+  activeTab: 'map' | 'search' | 'commercial' | 'documents' | 'services' | 'cabinet'
   setActiveTab: (t: AppState['activeTab']) => void
 }
 

@@ -4,9 +4,10 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { SearchPage } from '@/pages/SearchPage'
 import { MapPage } from '@/pages/MapPage'
 import { FavoritesPage } from '@/pages/FavoritesPage'
-import { CalculatorPage } from '@/pages/CalculatorPage'
 import { CabinetPage } from '@/pages/CabinetPage'
 import { ServicesPage } from '@/pages/ServicesPage'
+import { CommercialPage } from '@/pages/CommercialPage'
+import { DocumentsPage } from '@/pages/DocumentsPage'
 import { ListingDetailPage } from '@/pages/ListingDetailPage'
 import { ComparePage } from '@/pages/ComparePage'
 import { useStore } from '@/store'
@@ -27,7 +28,7 @@ function AppContent() {
   if (!ready) {
     return (
       <div className="flex items-center justify-center h-dvh">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -47,7 +48,7 @@ function AppContent() {
       {compareList.length > 0 && !showCompare && (
         <button
           onClick={() => setShowCompare(true)}
-          className="fixed top-4 right-4 z-30 bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
+          className="fixed top-4 right-4 z-30 bg-brand text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
         >
           📊 {compareList.length} {t('compare_badge', lang)}
         </button>
@@ -58,7 +59,7 @@ function AppContent() {
         {showCompare ? (
           <div className="h-full overflow-y-auto">
             <div className="px-4 pt-3">
-              <button onClick={() => setShowCompare(false)} className="text-blue-500 text-sm mb-2">
+              <button onClick={() => setShowCompare(false)} className="text-brand text-sm mb-2">
                 {t('back', lang)}
               </button>
             </div>
@@ -72,21 +73,25 @@ function AppContent() {
           <div className="h-full">
             <MapPage onSelect={setDetailId} />
           </div>
-        ) : activeTab === 'favorites' ? (
+        ) : activeTab === 'commercial' ? (
           <div className="h-full overflow-y-auto">
-            <FavoritesPage onSelect={setDetailId} />
+            <CommercialPage onSelect={setDetailId} />
           </div>
-        ) : activeTab === 'calculator' ? (
+        ) : activeTab === 'documents' ? (
           <div className="h-full overflow-y-auto">
-            <CalculatorPage />
+            <DocumentsPage />
+          </div>
+        ) : activeTab === 'services' ? (
+          <div className="h-full overflow-y-auto">
+            <ServicesPage />
           </div>
         ) : activeTab === 'cabinet' ? (
           <div className="h-full overflow-y-auto">
             <CabinetPage />
           </div>
-        ) : activeTab === 'services' ? (
+        ) : activeTab === 'favorites' ? (
           <div className="h-full overflow-y-auto">
-            <ServicesPage />
+            <FavoritesPage onSelect={setDetailId} />
           </div>
         ) : null}
       </div>

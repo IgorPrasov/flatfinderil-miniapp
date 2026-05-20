@@ -1,15 +1,16 @@
-import { Search, Map, Calculator, User, Wrench } from 'lucide-react'
+import { Search, Map, Building2, FileText, Wrench, User } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
 import { useTelegram } from '@/hooks/useTelegram'
 import { t } from '@/i18n'
 
 const TABS = [
-  { id: 'map',        icon: Map,        key: 'nav_map'        },
-  { id: 'search',     icon: Search,     key: 'nav_search'     },
-  { id: 'services',   icon: Wrench,     key: 'nav_services'   },
-  { id: 'calculator', icon: Calculator, key: 'nav_calculator' },
-  { id: 'cabinet',    icon: User,       key: 'nav_cabinet'    },
+  { id: 'map',        icon: Map,       key: 'nav_map'        },
+  { id: 'search',     icon: Search,    key: 'nav_search'     },
+  { id: 'commercial', icon: Building2, key: 'nav_commercial' },
+  { id: 'documents',  icon: FileText,  key: 'nav_documents'  },
+  { id: 'services',   icon: Wrench,    key: 'nav_services'   },
+  { id: 'cabinet',    icon: User,      key: 'nav_cabinet'    },
 ] as const
 
 export function BottomNav() {
